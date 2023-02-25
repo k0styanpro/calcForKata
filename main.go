@@ -8,6 +8,42 @@ import (
 
 var arabic bool
 
+func arabicToRoman(number int) string {
+	maxRomanNumber := 3999
+	if number > maxRomanNumber {
+		return strconv.Itoa(number)
+	}
+
+	conversions := []struct {
+		value int
+		digit string
+	}{
+		{1000, "M"},
+		{900, "CM"},
+		{500, "D"},
+		{400, "CD"},
+		{100, "C"},
+		{90, "XC"},
+		{50, "L"},
+		{40, "XL"},
+		{10, "X"},
+		{9, "IX"},
+		{5, "V"},
+		{4, "IV"},
+		{1, "I"},
+	}
+
+	res := ""
+	for _, conversion := range conversions {
+		for number >= conversion.value {
+			res = res + conversion.digit
+			number -= conversion.value
+		}
+	}
+
+	return res
+}
+
 func main() {
 
 	var a, b, c, d string
@@ -30,10 +66,7 @@ func main() {
 			fmt.Println("Вывод ошибки, так как строка не является математической операцией.")
 		}
 		if !arabic {
-			rom, err := arabicToRoman(res)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
+			rom := arabicToRoman(res)
 			fmt.Println(rom)
 			return
 		}
@@ -65,44 +98,8 @@ func values(a, b string) (int, int, error) {
 	return v1, v2, nil
 }
 
-func arabicToRoman(a int) (string, error) {
-	res := ""
-	if a <= 0 {
-		return res, errors.New("Вывод ошибки, так как в римской системе нет отрицательных чисел.")
-	}
-	if a >= 10 {
-		res = "X"
-		a = a - 10
-	}
-	if a > 0 {
-		switch a {
-		case 1:
-			res = res + "I"
-		case 2:
-			res = res + "II"
-		case 3:
-			res = res + "III"
-		case 4:
-			res = res + "IV"
-		case 5:
-			res = res + "V"
-		case 6:
-			res = res + "VI"
-		case 7:
-			res = res + "VII"
-		case 8:
-			res = res + "VIII"
-		case 9:
-			res = res + "IX"
-		case 10:
-			res = res + "X"
-		}
-	}
-	return res, nil
-}
-
 func romanToInt(s string) int {
-	rMap := map[string]int{"I": 1, "V": 5, "X": 10}
+	rMap := map[string]int{"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
 	result := 0
 	for k := range s {
 		if k < len(s)-1 && rMap[s[k:k+1]] < rMap[s[k+1:k+2]] {
